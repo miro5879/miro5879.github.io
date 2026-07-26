@@ -14,7 +14,7 @@
     tailwind.config = {
       theme: {
         extend: {
-          colors: { bgDark: '#0A0A0A', textMain: '#F5F5F7', textMuted: '#86868B', accent: '#FFFFFF' },
+          colors: { bgLight: '#FCFBF9', textMain: '#191919', textMuted: '#71717A', accent: '#000000' },
           fontFamily: { serif: ['"Cinzel"', 'serif'], sans: ['"Pretendard"', 'sans-serif'], mono: ['"JetBrains Mono"', 'monospace'] }
         }
       }
@@ -22,7 +22,14 @@
   </script>
 
   <style>
-    body { background-color: #0A0A0A; color: #F5F5F7; overflow-x: hidden; overscroll-behavior-y: none; -webkit-tap-highlight-color: transparent; }
+    body { background-color: #FCFBF9; color: #191919; overflow-x: hidden; overscroll-behavior-y: none; -webkit-tap-highlight-color: transparent; }
+    
+    /* 아날로그 필름 그레인 효과 (밝은 테마에서 영화 느낌 극대화) */
+    .film-grain {
+      position: fixed; inset: 0; pointer-events: none; z-index: 9999;
+      background-image: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)" opacity="0.04"/%3E%3C/svg%3E');
+    }
+
     .fade-up { opacity: 0; transform: translateY(40px); transition: all 1.2s cubic-bezier(0.2, 0.8, 0.2, 1); }
     .fade-up.active { opacity: 1; transform: translateY(0); }
 
@@ -33,7 +40,7 @@
     .film-cut { flex: 0 0 85%; scroll-snap-align: center; margin-right: 15px; user-select: none; position: relative; }
     
     /* 더블 탭 하트 */
-    .like-heart { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); font-size: 80px; color: white; text-shadow: 0 4px 20px rgba(0,0,0,0.5); opacity: 0; pointer-events: none; z-index: 20; }
+    .like-heart { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); font-size: 80px; color: white; text-shadow: 0 4px 20px rgba(0,0,0,0.3); opacity: 0; pointer-events: none; z-index: 20; }
     .like-heart.animate { animation: popHeart 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
     @keyframes popHeart { 0% { transform: translate(-50%, -50%) scale(0); opacity: 0; } 15% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; } 30% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 80% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; } }
 
@@ -41,7 +48,7 @@
     .credits-mask { height: 350px; overflow: hidden; position: relative; mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent); -webkit-mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent); }
     .credits-track { display: flex; flex-direction: column; animation: scrollCredits 20s linear infinite; }
     .credits-track:hover { animation-play-state: paused; }
-    @keyframes scrollCredits { 0% { transform: translateY(100%); } 100% { transform: translateY(-100%); } }
+    @keyframes scrollCredits { 0% { transform: translateY(0); } 100% { transform: translateY(-50%); } }
 
     /* 모달 및 UI 애니메이션 */
     .modal-overlay { transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -54,90 +61,98 @@
     /* 커스텀 토스트 (알림창) */
     #custom-toast {
       position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%);
-      background: rgba(255, 255, 255, 0.95); color: #111; padding: 14px 28px;
-      border-radius: 40px; font-size: 13px; font-weight: 600; letter-spacing: 0.5px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.4); transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      z-index: 99999; white-space: nowrap; pointer-events: none;
+      background: rgba(0, 0, 0, 0.85); color: #FFF; padding: 14px 28px;
+      border-radius: 40px; font-size: 13px; font-weight: 500; letter-spacing: 0.5px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 99999; white-space: nowrap; pointer-events: none; backdrop-filter: blur(4px);
     }
     #custom-toast.show { bottom: 40px; }
 
     /* 모바일 티켓 (절취선 및 펀칭 효과) */
-    .ticket-stub { border-bottom: 2px dashed #D1D5DB; position: relative; }
-    .ticket-stub::before, .ticket-stub::after {
-      content: ''; position: absolute; bottom: -12px; width: 24px; height: 24px; background-color: #1A1A1A; border-radius: 50%;
-    }
-    .ticket-stub::before { left: -12px; }
-    .ticket-stub::after { right: -12px; }
+    .ticket-stub { border-bottom: 2px dashed #E5E7EB; position: relative; }
+    .ticket-stub::before, .ticket-stub::after { content: ''; position: absolute; bottom: -12px; width: 24px; height: 24px; background-color: #FCFBF9; border-radius: 50%; border: 1px solid #E5E7EB; }
+    .ticket-stub::before { left: -12px; border-right-color: transparent; border-bottom-color: transparent; transform: rotate(45deg); }
+    .ticket-stub::after { right: -12px; border-left-color: transparent; border-bottom-color: transparent; transform: rotate(-45deg); }
   </style>
 </head>
-<body class="font-sans antialiased selection:bg-white selection:text-black">
+<body class="font-sans antialiased selection:bg-black selection:text-white relative">
+
+  <!-- 아날로그 필름 효과 오버레이 -->
+  <div class="film-grain"></div>
 
   <div id="custom-toast"></div>
 
-  <!-- BGM 플레이어 -->
-  <button id="bgm-btn" onclick="toggleBGM()" class="fixed top-6 right-6 z-50 w-10 h-10 bg-black/50 backdrop-blur-md rounded-full border border-white/20 flex items-center justify-center text-white shadow-lg transition hover:scale-110">
+  <!-- BGM 플레이어 (밝은 테마에 맞게 색상 변경) -->
+  <button id="bgm-btn" onclick="toggleBGM()" class="fixed top-6 right-6 z-50 w-10 h-10 bg-white/80 backdrop-blur-md rounded-full border border-gray-200 flex items-center justify-center text-black shadow-md transition hover:scale-110">
     <svg id="bgm-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="2"/></svg>
   </button>
   <audio id="bgm-audio" loop>
     <source src="https://cdn.pixabay.com/download/audio/2022/01/26/audio_d0c6ff1bc1.mp3" type="audio/mpeg">
   </audio>
 
-  <div class="max-w-[480px] mx-auto bg-bgDark min-h-screen relative overflow-hidden pb-10 shadow-2xl">
+  <div class="max-w-[480px] mx-auto bg-bgLight min-h-screen relative overflow-hidden pb-10 shadow-2xl">
     
     <!-- 메인 커버 -->
     <section class="relative h-screen w-full flex flex-col justify-end pb-24">
-      <div class="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-60" style="background-image: url('https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&q=80')"></div>
-      <div class="absolute inset-0 bg-gradient-to-t from-bgDark via-bgDark/40 to-transparent z-0"></div>
+      <div class="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat" style="background-image: url('https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&q=80')"></div>
+      <!-- 어두운 이미지에 글씨가 잘 보이도록 부드러운 아이보리 그라데이션 -->
+      <div class="absolute inset-0 bg-gradient-to-t from-[#FCFBF9] via-[#FCFBF9]/80 to-transparent z-0"></div>
+      
       <div class="z-10 px-8 fade-up active">
-        <p class="font-mono text-xs text-textMuted mb-2 tracking-[0.3em]">A FILM BY SEUNGYEOP & HEEAE</p>
-        <h1 class="font-serif text-5xl font-semibold tracking-wider mb-4 leading-tight">THE<br>BEGINNING</h1>
-        <div class="w-8 h-[1px] bg-white mb-6"></div>
-        <p class="text-[14px] font-light tracking-[0.2em] text-textMuted mb-6">2027. 04. 25. SUN. 11:00 AM</p>
-        <button onclick="downloadICS()" class="flex items-center gap-2 text-[11px] font-mono tracking-widest border border-[#444] px-4 py-2 rounded-full hover:bg-white hover:text-black transition">
+        <p class="font-mono text-xs text-gray-500 mb-2 tracking-[0.3em]">A FILM BY SEUNGYEOP & HEEAE</p>
+        <h1 class="font-serif text-5xl font-semibold tracking-wider mb-4 leading-tight text-black">THE<br>BEGINNING</h1>
+        <div class="w-8 h-[1px] bg-black mb-6"></div>
+        <p class="text-[14px] font-medium tracking-[0.2em] text-gray-800 mb-6">2027. 04. 25. SUN. 11:00 AM</p>
+        <button onclick="downloadICS()" class="flex items-center gap-2 text-[11px] font-mono tracking-widest border border-gray-300 bg-white/50 backdrop-blur-sm text-black px-4 py-2 rounded-full hover:bg-black hover:text-white transition">
           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
           ADD TO CALENDAR
         </button>
       </div>
     </section>
 
-    <!-- 영화 캐스팅 및 혼주 (수평 정렬) -->
-    <section class="py-20 px-6 text-center fade-up border-b border-[#111]">
-      <h2 class="font-mono text-[10px] text-textMuted tracking-[0.4em] mb-12 uppercase">Starring</h2>
+    <!-- 영화 캐스팅 (수평 정렬) -->
+    <section class="py-20 px-6 text-center fade-up border-b border-gray-200">
+      <h2 class="font-mono text-[10px] text-gray-400 tracking-[0.4em] mb-12 uppercase">Starring</h2>
       
-      <div class="flex justify-center items-center w-full">
+      <div class="flex justify-center items-center w-full max-w-[360px] mx-auto">
+        <!-- 신랑측 (좌) -->
         <div class="flex flex-col items-center flex-1">
-          <span class="text-[11px] text-[#AAA] tracking-widest mb-1 whitespace-nowrap">홍길동 · 홍길동</span>
-          <span class="text-[9px] text-[#666] font-mono mb-2">의 아들</span>
-          <span class="text-white text-xl font-medium tracking-widest">승엽</span>
+          <span class="text-[11px] text-gray-600 tracking-widest mb-1 whitespace-nowrap">홍길동 · 홍길동</span>
+          <span class="text-[9px] text-gray-400 font-mono mb-2">의 아들</span>
+          <span class="text-black text-xl font-semibold tracking-widest">승엽</span>
         </div>
-        <div class="w-px h-16 bg-[#333] mx-2"></div>
+        
+        <!-- 중앙 구분선 -->
+        <div class="w-px h-16 bg-gray-300 mx-4"></div>
+        
+        <!-- 신부측 (우) -->
         <div class="flex flex-col items-center flex-1">
-          <span class="text-[11px] text-[#AAA] tracking-widest mb-1 whitespace-nowrap">홍길동 · 홍길동</span>
-          <span class="text-[9px] text-[#666] font-mono mb-2">의 딸</span>
-          <span class="text-white text-xl font-medium tracking-widest">희애</span>
+          <span class="text-[11px] text-gray-600 tracking-widest mb-1 whitespace-nowrap">홍길동 · 홍길동</span>
+          <span class="text-[9px] text-gray-400 font-mono mb-2">의 딸</span>
+          <span class="text-black text-xl font-semibold tracking-widest">희애</span>
         </div>
       </div>
     </section>
 
     <!-- 시놉시스 -->
     <section class="py-24 px-8 text-center fade-up">
-      <h2 class="font-mono text-[10px] text-textMuted tracking-[0.4em] mb-12 border-b border-[#333] pb-4 uppercase inline-block">Synopsis</h2>
-      <div class="space-y-10 leading-[2.2] font-light text-[14px] text-[#CCC]">
-        <p>수많은 계절을 지나<br>우리의 타임라인이 하나의 궤도로 겹쳐진 날.<br><span class="text-white font-medium">서로를 향한 긴 프롤로그를 끝내고,</span><br>이제 진짜 첫 씬(Scene)을 촬영하려 합니다.</p>
+      <h2 class="font-mono text-[10px] text-gray-400 tracking-[0.4em] mb-12 border-b border-gray-300 pb-4 uppercase inline-block">Synopsis</h2>
+      <div class="space-y-10 leading-[2.2] font-light text-[14px] text-gray-700">
+        <p>수많은 계절을 지나<br>우리의 타임라인이 하나의 궤도로 겹쳐진 날.<br><span class="text-black font-semibold">서로를 향한 긴 프롤로그를 끝내고,</span><br>이제 진짜 첫 씬(Scene)을 촬영하려 합니다.</p>
         <p>완벽하지 않은 컷들이 모여<br>가장 아름다운 영화가 되듯,<br>서로의 여백을 채우며 살아가겠습니다.</p>
       </div>
     </section>
 
     <!-- 모션 포스터 -->
-    <section class="py-16 px-8 fade-up bg-[#0D0D0D]">
-      <div class="border border-[#222] p-2 rounded-lg bg-black relative">
-        <span class="absolute -top-3 left-6 bg-black px-3 font-mono text-[10px] tracking-[0.3em] text-white">SPECIAL CUT</span>
-        <div class="w-full aspect-[4/5] bg-[#111] rounded overflow-hidden relative flex items-center justify-center">
+    <section class="py-16 px-8 fade-up bg-[#F3F2EF]">
+      <div class="border border-gray-300 p-2 rounded-lg bg-white relative shadow-sm">
+        <span class="absolute -top-3 left-6 bg-black px-3 py-0.5 font-mono text-[10px] tracking-[0.3em] text-white">SPECIAL CUT</span>
+        <div class="w-full aspect-[4/5] bg-gray-100 rounded overflow-hidden relative flex items-center justify-center">
           <img src="https://images.unsplash.com/photo-1532712938310-34cb3982ef74?auto=format&fit=crop&q=80" 
-               alt="무빙 포스터 썸네일" class="w-full h-full object-cover opacity-80 mix-blend-luminosity">
-          <p class="absolute font-mono text-xs text-[#555] tracking-widest z-10">[ AI MOTION POSTER SPACE ]</p>
+               alt="무빙 포스터 썸네일" class="w-full h-full object-cover opacity-90 mix-blend-multiply">
+          <p class="absolute font-mono text-xs text-gray-500 tracking-widest z-10">[ AI MOTION POSTER SPACE ]</p>
         </div>
-        <p class="text-center text-[11px] text-[#666] mt-4 mb-2 font-light tracking-wide">두 분의 특별한 순간이 담긴 무빙 포스터입니다.</p>
+        <p class="text-center text-[11px] text-gray-500 mt-4 mb-2 font-light tracking-wide">두 분의 특별한 순간이 담긴 무빙 포스터입니다.</p>
       </div>
     </section>
 
@@ -145,161 +160,164 @@
     <section class="py-20 fade-up">
       <div class="px-8 flex justify-between items-end mb-8">
         <div class="space-y-1">
-          <h2 class="font-mono text-[10px] text-textMuted tracking-[0.4em] uppercase">Scene Stills</h2>
-          <p class="text-[10px] text-[#666]">사진을 두 번 탭해보세요 🤍</p>
+          <h2 class="font-mono text-[10px] text-gray-400 tracking-[0.4em] uppercase">Scene Stills</h2>
+          <p class="text-[10px] text-gray-500">사진을 두 번 탭해보세요 🤍</p>
         </div>
-        <button onclick="toggleGalleryModal(true)" class="font-mono text-[9px] text-[#888] border border-[#333] px-3 py-1.5 rounded hover:bg-white hover:text-black transition uppercase tracking-widest">
+        <button onclick="toggleGalleryModal(true)" class="font-mono text-[9px] text-gray-600 border border-gray-300 px-3 py-1.5 rounded hover:bg-black hover:text-white transition uppercase tracking-widest">
           View All
         </button>
       </div>
       
       <div class="film-strip pl-8 pb-4" id="filmStrip">
         <div class="film-cut image-container">
-          <span class="absolute top-2 left-3 text-[9px] font-mono bg-black/50 px-2 py-1 rounded text-white backdrop-blur-sm z-10">SCENE 01</span>
-          <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=600&q=80" class="w-full aspect-[4/5] object-cover rounded-md pointer-events-none" />
+          <span class="absolute top-2 left-3 text-[9px] font-mono bg-black/60 px-2 py-1 rounded text-white backdrop-blur-sm z-10">SCENE 01</span>
+          <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=600&q=80" class="w-full aspect-[4/5] object-cover rounded-md pointer-events-none shadow-sm" />
           <div class="like-heart">🤍</div>
         </div>
         <div class="film-cut image-container">
-          <span class="absolute top-2 left-3 text-[9px] font-mono bg-black/50 px-2 py-1 rounded text-white backdrop-blur-sm z-10">SCENE 02</span>
-          <img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=600&q=80" class="w-full aspect-[4/5] object-cover rounded-md pointer-events-none" />
+          <span class="absolute top-2 left-3 text-[9px] font-mono bg-black/60 px-2 py-1 rounded text-white backdrop-blur-sm z-10">SCENE 02</span>
+          <img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=600&q=80" class="w-full aspect-[4/5] object-cover rounded-md pointer-events-none shadow-sm" />
           <div class="like-heart">🤍</div>
         </div>
         <div class="film-cut image-container pr-8">
-          <span class="absolute top-2 left-3 text-[9px] font-mono bg-black/50 px-2 py-1 rounded text-white backdrop-blur-sm z-10">SCENE 03</span>
-          <img src="https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=600&q=80" class="w-full aspect-[4/5] object-cover rounded-md pointer-events-none" />
+          <span class="absolute top-2 left-3 text-[9px] font-mono bg-black/60 px-2 py-1 rounded text-white backdrop-blur-sm z-10">SCENE 03</span>
+          <img src="https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=600&q=80" class="w-full aspect-[4/5] object-cover rounded-md pointer-events-none shadow-sm" />
           <div class="like-heart">🤍</div>
         </div>
       </div>
     </section>
 
     <!-- 모바일 티켓 (RSVP) -->
-    <section class="py-20 px-8 fade-up mt-8 border-b border-[#111]">
-      <div class="border border-[#222] bg-[#111] rounded-xl p-8 relative overflow-hidden shadow-[0_0_30px_rgba(255,255,255,0.03)]">
-        <div class="absolute -right-4 -top-4 text-[#222] font-serif text-8xl opacity-30 pointer-events-none">VIP</div>
-        <h2 class="font-mono text-[10px] text-textMuted tracking-[0.4em] mb-6 uppercase relative z-10">Ticketing</h2>
-        <p class="text-[15px] font-light mb-8 text-[#DDD] leading-relaxed relative z-10">완벽한 좌석과 식사 준비를 위해<br>참석 여부를 미리 알려주세요.</p>
-        <button onclick="toggleRsvp(true)" class="w-full py-4 bg-white text-black font-semibold tracking-widest text-[13px] rounded hover:bg-gray-200 transition relative z-10">
+    <section class="py-20 px-8 fade-up mt-8 border-b border-gray-200">
+      <div class="border border-gray-200 bg-white rounded-xl p-8 relative overflow-hidden shadow-lg">
+        <div class="absolute -right-4 -top-4 text-gray-100 font-serif text-8xl opacity-80 pointer-events-none">VIP</div>
+        <h2 class="font-mono text-[10px] text-gray-400 tracking-[0.4em] mb-6 uppercase relative z-10">Ticketing</h2>
+        <p class="text-[15px] font-light mb-8 text-gray-700 leading-relaxed relative z-10">완벽한 좌석과 식사 준비를 위해<br>참석 여부를 미리 알려주세요.</p>
+        <button onclick="toggleRsvp(true)" class="w-full py-4 bg-black text-white font-semibold tracking-widest text-[13px] rounded hover:bg-gray-800 transition relative z-10 shadow-md">
           모바일 티켓 발급받기
         </button>
       </div>
     </section>
 
-    <!-- 방명록 & 엔딩 크레딧 -->
-    <section class="py-24 px-8 fade-up bg-[#050505]">
-      <h2 class="font-mono text-[10px] text-textMuted tracking-[0.4em] mb-4 text-center uppercase">End Credits (Reviews)</h2>
-      <p class="text-center text-[12px] text-[#666] mb-10 font-light">두 사람의 새로운 영화에<br>축하의 관람평을 남겨주세요.</p>
+    <!-- 방명록 & 엔딩 크레딧 (무한 롤링) -->
+    <section class="py-24 px-8 fade-up bg-gray-50">
+      <h2 class="font-mono text-[10px] text-gray-400 tracking-[0.4em] mb-4 text-center uppercase">End Credits (Reviews)</h2>
+      <p class="text-center text-[12px] text-gray-500 mb-10 font-light">두 사람의 새로운 영화에<br>축하의 관람평을 남겨주세요.</p>
       
       <div class="credits-mask mb-10">
         <div id="credits-track" class="credits-track space-y-10 text-center">
-          <div class="space-y-2 mb-16">
-            <p class="font-mono text-[10px] text-[#555] uppercase tracking-widest">Directed By</p>
-            <p class="text-white text-[16px] font-medium tracking-widest">승엽 · 희애</p>
+          <div class="credits-group space-y-10">
+            <div class="space-y-2 pt-6">
+              <p class="font-mono text-[10px] text-gray-400 uppercase tracking-widest">Directed By</p>
+              <p class="text-black text-[16px] font-semibold tracking-widest">승엽 · 희애</p>
+            </div>
+            <div class="w-8 h-[1px] bg-gray-300 mx-auto"></div>
+            <p class="font-mono text-[12px] text-gray-500 uppercase tracking-[0.3em]">Special Thanks To</p>
+            <div id="reviews-container" class="space-y-10">
+              <div class="review-item space-y-2">
+                <p class="text-black text-[14px] font-medium">홍길동</p>
+                <p class="text-gray-500 text-[12px] font-light leading-relaxed">두 분의 첫 시사회, 진심으로 축하드립니다!<br>평생 아름다운 영화 찍으시길 바랄게요.</p>
+              </div>
+            </div>
           </div>
-          <div class="w-8 h-[1px] bg-[#333] mx-auto mb-16"></div>
-          <p class="font-mono text-[12px] text-[#888] uppercase tracking-[0.3em] mb-12">Special Thanks To</p>
-          <div class="review-item space-y-2">
-            <p class="text-white text-[14px] font-medium">홍길동</p>
-            <p class="text-[#888] text-[12px] font-light leading-relaxed">두 분의 첫 시사회, 진심으로 축하드립니다!<br>평생 아름다운 영화 찍으시길 바랄게요.</p>
-          </div>
-          <div class="h-40"></div>
         </div>
       </div>
 
-      <div class="bg-[#0A0A0A] p-5 rounded-lg border border-[#222] relative z-10 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
-        <input type="text" id="reviewName" placeholder="작성자 성함" class="w-full bg-transparent border-b border-[#333] pb-2 mb-4 text-[13px] text-white outline-none focus:border-[#888] transition">
-        <textarea id="reviewText" placeholder="축하 메시지를 입력해주세요." rows="2" class="w-full bg-transparent border-b border-[#333] pb-2 mb-4 text-[13px] text-white outline-none focus:border-[#888] transition resize-none"></textarea>
-        <button onclick="addReview()" class="w-full py-3 bg-[#1A1A1A] text-white text-[12px] font-semibold tracking-widest rounded border border-[#333] hover:bg-white hover:text-black transition">
+      <div class="bg-white p-5 rounded-lg border border-gray-200 relative z-10 shadow-lg">
+        <input type="text" id="reviewName" placeholder="작성자 성함" class="w-full bg-transparent border-b border-gray-300 pb-2 mb-4 text-[13px] text-black outline-none focus:border-black transition">
+        <textarea id="reviewText" placeholder="축하 메시지를 입력해주세요." rows="2" class="w-full bg-transparent border-b border-gray-300 pb-2 mb-4 text-[13px] text-black outline-none focus:border-black transition resize-none"></textarea>
+        <button onclick="addReview()" class="w-full py-3 bg-black text-white text-[12px] font-semibold tracking-widest rounded hover:bg-gray-800 transition">
           크레딧에 이름 올리기
         </button>
       </div>
     </section>
 
     <!-- 조건부 사진 공유 -->
-    <section class="py-20 px-8 text-center fade-up border-b border-[#111]">
-      <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#1A1A1A] mb-6 border border-[#222]">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-white"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    <section class="py-20 px-8 text-center fade-up border-b border-gray-200">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white shadow-sm border border-gray-200 mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-black"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
       </div>
-      <h2 class="font-mono text-[10px] text-white tracking-[0.4em] mb-3 uppercase">Guest Cam</h2>
-      <p class="text-[12px] text-textMuted font-light mb-8">당신의 시선으로 담은 컷들을 공유해주세요.</p>
-      <button onclick="handlePhotoUpload()" class="border border-[#444] bg-transparent text-white px-8 py-3 rounded-full text-[12px] font-light tracking-wide hover:bg-[#222] transition">사진 첨부하기</button>
+      <h2 class="font-mono text-[10px] text-black tracking-[0.4em] mb-3 uppercase font-bold">Guest Cam</h2>
+      <p class="text-[12px] text-gray-500 font-light mb-8">당신의 시선으로 담은 컷들을 공유해주세요.</p>
+      <button onclick="handlePhotoUpload()" class="border border-gray-300 bg-white text-black px-8 py-3 rounded-full text-[12px] font-medium tracking-wide hover:bg-gray-100 transition shadow-sm">사진 첨부하기</button>
     </section>
 
-    <!-- 상영관 (4층 및 주차/교통 완벽 반영) -->
-    <section class="py-24 px-8 fade-up border-t border-[#111]">
-      <h2 class="font-mono text-[10px] text-textMuted tracking-[0.4em] mb-10 text-center uppercase">Theater</h2>
+    <!-- 상영관 (지도, 오시는 길) -->
+    <section class="py-24 px-8 fade-up border-t border-gray-100">
+      <h2 class="font-mono text-[10px] text-gray-400 tracking-[0.4em] mb-10 text-center uppercase">Theater</h2>
       <div class="text-center mb-8">
-        <p class="font-serif text-2xl text-white tracking-widest mb-3">JW WEDDING HALL</p>
-        <p class="text-[14px] text-white font-medium mb-1">JW 웨딩홀 <span class="text-yellow-500">4층 그랜드볼룸</span></p>
-        <p class="text-[13px] text-[#AAA] font-light mt-2">경남 김해시 김해대로 2520</p>
+        <p class="font-serif text-2xl text-black tracking-widest mb-3">JW WEDDING HALL</p>
+        <p class="text-[14px] text-black font-semibold mb-1">JW 웨딩홀 <span class="text-yellow-600">4층 그랜드볼룸</span></p>
+        <p class="text-[13px] text-gray-600 font-light mt-2">경남 김해시 김해대로 2520</p>
       </div>
       
-      <div class="w-full h-48 bg-[#111] flex items-center justify-center text-[11px] text-[#555] font-mono border border-[#222] mb-4 rounded-md">
+      <div class="w-full h-48 bg-gray-100 flex items-center justify-center text-[11px] text-gray-400 font-mono border border-gray-200 mb-4 rounded-md">
         [ MAP API INTEGRATION ]
       </div>
       
       <div class="flex gap-2 mb-10">
-        <button class="flex-1 py-3 bg-[#222] text-white text-[12px] tracking-wide hover:bg-[#333] transition rounded-sm">네이버 지도</button>
-        <button class="flex-1 py-3 bg-[#222] text-white text-[12px] tracking-wide hover:bg-[#333] transition rounded-sm">카카오 맵</button>
+        <button class="flex-1 py-3 bg-white text-black border border-gray-300 text-[12px] tracking-wide hover:bg-gray-100 transition rounded-sm shadow-sm">네이버 지도</button>
+        <button class="flex-1 py-3 bg-white text-black border border-gray-300 text-[12px] tracking-wide hover:bg-gray-100 transition rounded-sm shadow-sm">카카오 맵</button>
       </div>
 
-      <div class="text-left text-[#AAA] text-[13px] space-y-6 pt-6 border-t border-[#222]">
+      <div class="text-left text-gray-600 text-[13px] space-y-6 pt-6 border-t border-gray-200">
         <div class="flex items-start gap-4">
-          <span class="w-14 font-mono text-[10px] text-[#666] tracking-widest mt-1">SUBWAY</span>
-          <p class="flex-1 leading-relaxed"><span class="text-white font-medium">경전철 이용 시</span><br>인제대역 하차 후 1번 출구 이용 (도보 1분거리)</p>
+          <span class="w-14 font-mono text-[10px] text-gray-400 tracking-widest mt-1">SUBWAY</span>
+          <p class="flex-1 leading-relaxed"><span class="text-black font-semibold">경전철 이용 시</span><br>인제대역 하차 후 1번 출구 이용 (도보 1분거리)</p>
         </div>
         <div class="flex items-start gap-4">
-          <span class="w-14 font-mono text-[10px] text-[#666] tracking-widest mt-1">BUS</span>
-          <p class="flex-1 leading-relaxed"><span class="text-white font-medium">버스 이용 시</span><br>인제대역 하차<br>(2, 2-1, 4, 7, 82, 123, 124, 127, 1004)</p>
+          <span class="w-14 font-mono text-[10px] text-gray-400 tracking-widest mt-1">BUS</span>
+          <p class="flex-1 leading-relaxed"><span class="text-black font-semibold">버스 이용 시</span><br>인제대역 하차<br>(2, 2-1, 4, 7, 82, 123, 124, 127, 1004)</p>
         </div>
         <div class="flex items-start gap-4">
-          <span class="w-14 font-mono text-[10px] text-[#666] tracking-widest mt-1">PARKING</span>
-          <p class="flex-1 leading-relaxed"><span class="text-white font-medium">A·B·C 주차장 및 메가마트 주차장</span><br>동시 1,500대 무료 주차 (주차 시간 제한 없음)</p>
+          <span class="w-14 font-mono text-[10px] text-gray-400 tracking-widest mt-1">PARKING</span>
+          <p class="flex-1 leading-relaxed"><span class="text-black font-semibold">A·B·C 주차장 및 메가마트 주차장</span><br>동시 1,500대 무료 주차 (주차 시간 제한 없음)</p>
         </div>
       </div>
     </section>
 
     <!-- 마음 전하실 곳 -->
-    <section class="py-24 px-8 bg-[#0D0D0D] border-t border-[#1a1a1a] fade-up">
-      <h2 class="font-mono text-[10px] text-textMuted tracking-[0.4em] mb-10 text-center uppercase">Heart & Gift</h2>
-      <p class="text-[13px] text-[#888] font-light text-center mb-10">참석이 어려우신 분들을 위해<br>마음 전하실 곳을 기재하였습니다.</p>
+    <section class="py-24 px-8 bg-[#F3F2EF] border-t border-gray-200 fade-up">
+      <h2 class="font-mono text-[10px] text-gray-400 tracking-[0.4em] mb-10 text-center uppercase">Heart & Gift</h2>
+      <p class="text-[13px] text-gray-600 font-light text-center mb-10">참석이 어려우신 분들을 위해<br>마음 전하실 곳을 기재하였습니다.</p>
       <div class="space-y-3">
-        <div class="bg-[#111] rounded-md border border-[#222]">
-          <button onclick="toggleAccordion('groom-acc')" class="w-full px-6 py-5 flex justify-between items-center text-[14px] font-medium text-white hover:bg-[#1A1A1A] transition">
-            신랑측 계좌번호 <span class="text-[11px] text-[#666] font-mono">OPEN +</span>
+        <div class="bg-white rounded-md border border-gray-200 shadow-sm">
+          <button onclick="toggleAccordion('groom-acc')" class="w-full px-6 py-5 flex justify-between items-center text-[14px] font-semibold text-black hover:bg-gray-50 transition">
+            신랑측 계좌번호 <span class="text-[11px] text-gray-400 font-mono">OPEN +</span>
           </button>
-          <div id="groom-acc" class="accordion-body px-6 bg-[#0A0A0A]">
-            <div class="pb-5 pt-3 flex justify-between items-end border-t border-[#222]">
-              <div><p class="text-[12px] text-[#888] mb-1">국민은행 123456-00-123456</p><p class="text-[14px] text-white">예금주 : 이승엽</p></div>
-              <button onclick="copyAcc('12345600123456')" class="text-[11px] border border-[#444] px-3 py-1.5 rounded bg-transparent text-white hover:bg-[#222] transition">복사하기</button>
+          <div id="groom-acc" class="accordion-body px-6 bg-gray-50">
+            <div class="pb-5 pt-3 flex justify-between items-end border-t border-gray-200">
+              <div><p class="text-[12px] text-gray-500 mb-1">국민은행 123456-00-123456</p><p class="text-[14px] text-black font-medium">예금주 : 이승엽</p></div>
+              <button onclick="copyAcc('12345600123456')" class="text-[11px] border border-gray-300 px-3 py-1.5 rounded bg-white text-black hover:bg-gray-100 transition shadow-sm">복사하기</button>
             </div>
           </div>
         </div>
-        <div class="bg-[#111] rounded-md border border-[#222]">
-          <button onclick="toggleAccordion('bride-acc')" class="w-full px-6 py-5 flex justify-between items-center text-[14px] font-medium text-white hover:bg-[#1A1A1A] transition">
-            신부측 계좌번호 <span class="text-[11px] text-[#666] font-mono">OPEN +</span>
+        <div class="bg-white rounded-md border border-gray-200 shadow-sm">
+          <button onclick="toggleAccordion('bride-acc')" class="w-full px-6 py-5 flex justify-between items-center text-[14px] font-semibold text-black hover:bg-gray-50 transition">
+            신부측 계좌번호 <span class="text-[11px] text-gray-400 font-mono">OPEN +</span>
           </button>
-          <div id="bride-acc" class="accordion-body px-6 bg-[#0A0A0A]">
-            <div class="pb-5 pt-3 flex justify-between items-end border-t border-[#222]">
-              <div><p class="text-[12px] text-[#888] mb-1">신한은행 110-123-456789</p><p class="text-[14px] text-white">예금주 : 김희애</p></div>
-              <button onclick="copyAcc('110123456789')" class="text-[11px] border border-[#444] px-3 py-1.5 rounded bg-transparent text-white hover:bg-[#222] transition">복사하기</button>
+          <div id="bride-acc" class="accordion-body px-6 bg-gray-50">
+            <div class="pb-5 pt-3 flex justify-between items-end border-t border-gray-200">
+              <div><p class="text-[12px] text-gray-500 mb-1">신한은행 110-123-456789</p><p class="text-[14px] text-black font-medium">예금주 : 김희애</p></div>
+              <button onclick="copyAcc('110123456789')" class="text-[11px] border border-gray-300 px-3 py-1.5 rounded bg-white text-black hover:bg-gray-100 transition shadow-sm">복사하기</button>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 슬레이트 액션 (미공개 컷) -->
-    <section class="py-24 px-8 text-center fade-up bg-[#050505]">
-      <h2 class="font-mono text-[10px] text-textMuted tracking-[0.4em] mb-4 uppercase">Behind The Scenes</h2>
-      <p class="text-[12px] text-[#666] font-light mb-10">감독판에만 수록된 미공개 컷을 확인하세요.</p>
+    <!-- 슬레이트 액션 -->
+    <section class="py-24 px-8 text-center fade-up bg-white">
+      <h2 class="font-mono text-[10px] text-gray-400 tracking-[0.4em] mb-4 uppercase">Behind The Scenes</h2>
+      <p class="text-[12px] text-gray-500 font-light mb-10">감독판에만 수록된 미공개 컷을 확인하세요.</p>
       
-      <button id="slate-btn" onclick="playSlate()" class="w-full h-16 bg-white text-black font-serif text-xl tracking-[0.3em] flex items-center justify-center relative overflow-hidden group rounded-sm shadow-xl">
-        <div class="absolute inset-0 bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,#e5e5e5_10px,#e5e5e5_20px)] opacity-40"></div>
+      <button id="slate-btn" onclick="playSlate()" class="w-full h-16 bg-black text-white font-serif text-xl tracking-[0.3em] flex items-center justify-center relative overflow-hidden group rounded-sm shadow-xl">
+        <div class="absolute inset-0 bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,rgba(255,255,255,0.1)_10px,rgba(255,255,255,0.1)_20px)] opacity-40"></div>
         <span class="relative z-10 flex items-center gap-3"><span class="text-2xl">🎬</span> ACTION</span>
       </button>
 
       <div id="bts-content" class="mt-12 hidden flex-col items-center opacity-0 transition-opacity duration-1000">
-        <div class="bg-white p-2 pb-12 w-[70%] mx-auto shadow-2xl transform -rotate-3">
+        <div class="bg-white p-2 pb-12 w-[70%] mx-auto shadow-2xl border border-gray-200 transform -rotate-3">
           <div class="space-y-1">
             <img src="https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&q=80" class="w-full aspect-square object-cover grayscale">
             <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&q=80" class="w-full aspect-square object-cover grayscale">
@@ -311,75 +329,74 @@
     </section>
 
     <!-- 타임코드 D-Day 및 공유 버튼 -->
-    <section class="py-24 px-8 text-center fade-up pb-32 border-t border-[#1a1a1a]">
-      <p class="font-mono text-[10px] text-textMuted tracking-[0.4em] mb-6 uppercase">Time remaining</p>
-      <div id="timecode" class="font-mono text-3xl font-light tracking-wider text-white mb-16">00:00:00:00</div>
+    <section class="py-24 px-8 text-center fade-up pb-32 border-t border-gray-200 bg-[#FCFBF9]">
+      <p class="font-mono text-[10px] text-gray-400 tracking-[0.4em] mb-6 uppercase">Time remaining</p>
+      <div id="timecode" class="font-mono text-3xl font-light tracking-wider text-black mb-16">00:00:00:00</div>
       
       <div class="flex gap-3 justify-center mb-16">
-        <button onclick="shareLink('kakao')" class="flex items-center gap-2 px-5 py-3 bg-[#FEE500] text-[#191919] rounded-full text-[12px] font-medium tracking-wide shadow-lg hover:opacity-90 transition">카카오톡 공유</button>
-        <button onclick="shareLink('copy')" class="flex items-center gap-2 px-5 py-3 bg-[#222] border border-[#444] text-white rounded-full text-[12px] font-medium tracking-wide shadow-lg hover:bg-[#333] transition">링크 복사</button>
+        <button onclick="shareLink('kakao')" class="flex items-center gap-2 px-5 py-3 bg-[#FEE500] text-[#191919] rounded-full text-[12px] font-semibold tracking-wide shadow-md hover:opacity-90 transition">카카오톡 공유</button>
+        <button onclick="shareLink('copy')" class="flex items-center gap-2 px-5 py-3 bg-white border border-gray-300 text-black rounded-full text-[12px] font-semibold tracking-wide shadow-sm hover:bg-gray-100 transition">링크 복사</button>
       </div>
-      <p class="font-serif text-sm text-[#333] tracking-[0.3em]">THANK YOU</p>
+      <p class="font-serif text-sm text-gray-400 tracking-[0.3em]">THANK YOU</p>
     </section>
 
-    <!-- 모달: RSVP 및 모바일 티켓 뷰어 (오해 방지 패스 디자인 적용) -->
-    <div id="rsvp-modal" class="modal-overlay fixed inset-x-0 bottom-0 max-w-[480px] mx-auto bg-[#1A1A1A] z-50 rounded-t-3xl border-t border-[#333] p-8 h-[85vh] flex flex-col">
+    <!-- 모달: RSVP 및 모바일 티켓 뷰어 -->
+    <div id="rsvp-modal" class="modal-overlay fixed inset-x-0 bottom-0 max-w-[480px] mx-auto bg-white z-50 rounded-t-3xl border-t border-gray-200 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] p-8 h-[85vh] flex flex-col">
       <div class="flex justify-between items-center mb-6">
-        <h3 class="font-mono text-sm tracking-widest text-white uppercase" id="rsvp-modal-title">Ticket Booking</h3>
-        <button onclick="toggleRsvp(false)" class="text-2xl text-[#666] hover:text-white">&times;</button>
+        <h3 class="font-mono text-sm tracking-widest text-black font-bold uppercase" id="rsvp-modal-title">Ticket Booking</h3>
+        <button onclick="toggleRsvp(false)" class="text-2xl text-gray-400 hover:text-black">&times;</button>
       </div>
       
-      <div id="rsvp-form-area" class="flex-1 overflow-y-auto space-y-8 text-left text-white pb-4 scrollbar-hide transition-opacity">
+      <div id="rsvp-form-area" class="flex-1 overflow-y-auto space-y-8 text-left text-black pb-4 scrollbar-hide transition-opacity">
         <div>
-          <label class="block font-mono text-[10px] text-[#888] tracking-widest mb-3 uppercase">Guest Name</label>
-          <input type="text" id="guestName" class="w-full bg-transparent border-b border-[#444] py-2 outline-none focus:border-white transition text-[15px]" placeholder="성함을 입력해주세요">
+          <label class="block font-mono text-[10px] text-gray-500 tracking-widest mb-3 uppercase">Guest Name</label>
+          <input type="text" id="guestName" class="w-full bg-transparent border-b border-gray-300 py-2 outline-none focus:border-black transition text-[15px]" placeholder="성함을 입력해주세요">
         </div>
         <div>
-          <label class="block font-mono text-[10px] text-[#888] tracking-widest mb-3 uppercase">Attendance</label>
+          <label class="block font-mono text-[10px] text-gray-500 tracking-widest mb-3 uppercase">Attendance</label>
           <div class="flex gap-2">
-            <button class="rsvp-btn flex-1 py-3 border border-[#444] bg-[#111] text-[#CCC] rounded text-[13px] font-light transition">참석합니다</button>
-            <button class="rsvp-btn flex-1 py-3 border border-[#444] bg-[#111] text-[#CCC] rounded text-[13px] font-light transition">마음만 전할게요</button>
+            <button class="rsvp-btn flex-1 py-3 border border-gray-200 bg-gray-100 text-gray-500 rounded text-[13px] font-light transition">참석합니다</button>
+            <button class="rsvp-btn flex-1 py-3 border border-gray-200 bg-gray-100 text-gray-500 rounded text-[13px] font-light transition">마음만 전할게요</button>
           </div>
         </div>
         <div>
-          <label class="block font-mono text-[10px] text-[#888] tracking-widest mb-3 uppercase">Dining</label>
+          <label class="block font-mono text-[10px] text-gray-500 tracking-widest mb-3 uppercase">Dining</label>
           <div class="flex gap-2">
-            <button class="meal-btn flex-1 py-3 border border-[#444] bg-[#111] text-[#CCC] rounded text-[13px] font-light transition">식사 하고 갈게요</button>
-            <button class="meal-btn flex-1 py-3 border border-[#444] bg-[#111] text-[#CCC] rounded text-[13px] font-light transition">안 하고 가요</button>
+            <button class="meal-btn flex-1 py-3 border border-gray-200 bg-gray-100 text-gray-500 rounded text-[13px] font-light transition">식사 하고 갈게요</button>
+            <button class="meal-btn flex-1 py-3 border border-gray-200 bg-gray-100 text-gray-500 rounded text-[13px] font-light transition">안 하고 가요</button>
           </div>
         </div>
       </div>
-      <button id="rsvp-submit-btn" onclick="submitRsvp()" class="w-full py-4 bg-white text-black font-semibold tracking-widest text-[13px] rounded mt-4 hover:bg-gray-200 transition">
+      <button id="rsvp-submit-btn" onclick="submitRsvp()" class="w-full py-4 bg-black text-white font-semibold tracking-widest text-[13px] rounded mt-4 hover:bg-gray-800 transition shadow-lg">
         티켓 발급 완료
       </button>
 
       <!-- 생성된 모바일 티켓 UI 영역 -->
       <div id="rsvp-ticket-area" class="hidden flex-1 flex-col items-center justify-center animate-fade-in mt-2">
-        <div id="ticket-card" class="bg-white text-black w-full max-w-[300px] rounded-lg shadow-2xl relative overflow-hidden">
+        <div id="ticket-card" class="bg-white text-black w-full max-w-[300px] rounded-lg shadow-xl border border-gray-200 relative overflow-hidden">
           <div class="bg-[#111] text-white p-4 text-center">
             <p class="font-mono text-[10px] tracking-[0.3em] text-[#888]">이승엽 · 김희애 결혼식</p>
             <p class="font-serif text-lg tracking-widest mt-1">PREMIERE TICKET</p>
           </div>
           <div class="ticket-stub p-6">
-            <p class="text-[10px] text-gray-500 font-mono mb-1 tracking-widest">VIP GUEST</p>
+            <p class="text-[10px] text-gray-400 font-mono mb-1 tracking-widest">VIP GUEST</p>
             <p id="ticket-guest-name" class="text-2xl font-bold mb-6 tracking-wide">홍길동 님</p>
             <div class="grid grid-cols-2 gap-4 text-left">
               <div>
                 <p class="text-[10px] text-gray-400 font-mono tracking-widest">DATE</p>
-                <p class="text-[13px] font-medium font-mono mt-1">2027.04.25</p>
+                <p class="text-[13px] font-semibold font-mono mt-1">2027.04.25</p>
               </div>
               <div>
                 <p class="text-[10px] text-gray-400 font-mono tracking-widest">TIME</p>
-                <p class="text-[13px] font-medium font-mono mt-1">11:00 AM</p>
+                <p class="text-[13px] font-semibold font-mono mt-1">11:00 AM</p>
               </div>
               <div class="col-span-2 mt-2">
                 <p class="text-[10px] text-gray-400 font-mono tracking-widest">VENUE</p>
-                <p class="text-[13px] font-medium mt-1">JW 웨딩홀 4층 그랜드볼룸</p>
+                <p class="text-[13px] font-semibold mt-1">JW 웨딩홀 4층 그랜드볼룸</p>
               </div>
             </div>
           </div>
-          <!-- 💡 QR 코드 대신 오해 없는 시네마틱 VIP 패스 배지 디자인 적용 -->
-          <div class="p-5 bg-[#F9FAFB] flex flex-col items-center justify-center rounded-b-lg">
+          <div class="p-5 bg-gray-50 flex flex-col items-center justify-center rounded-b-lg">
             <div class="border-2 border-dashed border-gray-300 w-full py-2 rounded flex flex-col items-center justify-center bg-white">
               <span class="font-mono text-[11px] font-bold tracking-[0.3em] text-black">VIP PASS</span>
               <span class="font-mono text-[8px] text-gray-400 tracking-widest mt-0.5">ADMIT ONE • 2027.04.25</span>
@@ -387,22 +404,21 @@
           </div>
         </div>
         
-        <!-- 부드러운 안내 멘트 -->
-        <p class="text-[12px] text-[#888] font-light mt-6 text-center leading-relaxed">
+        <p class="text-[12px] text-gray-500 font-medium mt-6 text-center leading-relaxed">
           참석 의사를 전달해주셔서 진심으로 감사합니다.
         </p>
-        <button onclick="downloadTicket()" class="mt-4 px-6 py-2.5 bg-[#222] text-white border border-[#444] rounded-full text-[12px] font-medium tracking-wide hover:bg-[#333] transition flex items-center justify-center gap-2">
+        <button onclick="downloadTicket()" class="mt-4 px-6 py-2.5 bg-black text-white rounded-full text-[12px] font-semibold tracking-wide hover:bg-gray-800 transition flex items-center justify-center gap-2 shadow-md">
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
           티켓 이미지 저장
         </button>
       </div>
     </div>
 
-    <!-- 모달: 전체보기 그리드 갤러리 -->
+    <!-- 모달: 전체보기 그리드 갤러리 (사진 감상을 위해 다크 테마 유지) -->
     <div id="gallery-modal" class="modal-overlay fixed inset-0 bg-[#0A0A0A] z-[60] overflow-y-auto flex-col hidden">
       <div class="sticky top-0 bg-[#0A0A0A]/90 backdrop-blur px-8 py-6 flex justify-between items-center z-10">
         <h3 class="font-mono text-sm tracking-widest text-white uppercase">All Stills</h3>
-        <button onclick="toggleGalleryModal(false)" class="text-3xl text-[#666] hover:text-white">&times;</button>
+        <button onclick="toggleGalleryModal(false)" class="text-3xl text-gray-400 hover:text-white">&times;</button>
       </div>
       <div class="p-4 grid grid-cols-3 gap-2 pb-20">
         <img onclick="openLightbox(this.src)" src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=600&q=80" class="w-full aspect-square object-cover rounded-sm cursor-pointer hover:opacity-70 transition" />
@@ -413,16 +429,15 @@
       </div>
     </div>
 
-    <!-- 모달: 사진 확대 (Lightbox) -->
+    <!-- 모달: 사진 확대 -->
     <div id="lightbox-modal" class="fixed inset-0 bg-black/95 z-[70] hidden flex-col items-center justify-center transition-opacity" onclick="closeLightbox()">
       <button class="absolute top-6 right-8 text-4xl text-white font-light">&times;</button>
-      <img id="lightbox-img" src="" class="max-w-full max-h-[85vh] object-contain p-4" />
+      <img id="lightbox-img" src="" class="max-w-full max-h-[85vh] object-contain p-4 shadow-2xl" />
     </div>
 
   </div>
 
   <script>
-    // 커스텀 토스트 알림창
     let toastTimeout;
     function showToast(message) {
       const toast = document.getElementById('custom-toast');
@@ -432,13 +447,11 @@
       toastTimeout = setTimeout(() => { toast.classList.remove('show'); }, 2500);
     }
 
-    // 스크롤 페이드업
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
     }, { threshold: 0.1 });
     document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 
-    // 갤러리 팝업 토글 (그리드)
     function toggleGalleryModal(show) {
       const modal = document.getElementById('gallery-modal');
       if(show) {
@@ -450,7 +463,6 @@
       }
     }
 
-    // 라이트박스 (사진 확대)
     function openLightbox(src) {
       document.getElementById('lightbox-img').src = src;
       const modal = document.getElementById('lightbox-modal');
@@ -461,7 +473,6 @@
       modal.classList.remove('flex'); modal.classList.add('hidden');
     }
 
-    // 갤러리 드래그 스크롤
     const filmStrip = document.getElementById('filmStrip');
     let isDown = false, startX, scrollLeft;
     filmStrip.addEventListener('mousedown', (e) => {
@@ -475,7 +486,6 @@
       filmStrip.scrollLeft = scrollLeft - ((e.pageX - filmStrip.offsetLeft) - startX) * 1.5;
     });
 
-    // 갤러리 더블탭 하트
     document.querySelectorAll('.image-container').forEach(container => {
       let lastTap = 0;
       container.addEventListener('click', function(e) {
@@ -490,32 +500,38 @@
       });
     });
 
-    // BGM
     const bgmAudio = document.getElementById('bgm-audio'), bgmIcon = document.getElementById('bgm-icon');
     let isPlaying = false;
     function toggleBGM() {
       if (isPlaying) { bgmAudio.pause(); bgmIcon.classList.remove('spin'); } 
-      else { bgmAudio.play().catch(e=>console.log("브라우저 정책 차단:", e)); bgmIcon.classList.add('spin'); }
+      else { bgmAudio.play().catch(e=>console.log("Audio Blocked:", e)); bgmIcon.classList.add('spin'); }
       isPlaying = !isPlaying;
     }
 
-    // 방명록 등록
+    function initInfiniteCredits() {
+      const track = document.getElementById('credits-track');
+      track.innerHTML += track.innerHTML;
+    }
+    window.addEventListener('DOMContentLoaded', initInfiniteCredits);
+
     function addReview() {
       const name = document.getElementById('reviewName').value;
       const text = document.getElementById('reviewText').value;
       if (!name || !text) return showToast('작성자와 축하 메시지를 모두 입력해주세요.');
       
-      const newReview = `<div class="review-item space-y-2 mt-8"><p class="text-white text-[14px] font-medium">${name}</p><p class="text-[#888] text-[12px] font-light leading-relaxed">${text.replace(/\n/g, '<br>')}</p></div>`;
+      const newReviewHtml = `
+        <div class="review-item space-y-2 mt-8">
+          <p class="text-black text-[14px] font-bold">${name}</p>
+          <p class="text-gray-600 text-[12px] font-medium leading-relaxed">${text.replace(/\n/g, '<br>')}</p>
+        </div>
+      `;
+      
       const track = document.getElementById('credits-track');
-      track.insertAdjacentHTML('beforeend', newReview);
-      
+      track.insertAdjacentHTML('beforeend', newReviewHtml);
       document.getElementById('reviewName').value = ''; document.getElementById('reviewText').value = '';
-      track.style.animation = 'none'; void track.offsetWidth; track.style.animation = 'scrollCredits 20s linear infinite';
-      
       showToast('관람평이 크레딧에 등록되었습니다 🍿');
     }
 
-    // 캘린더 등록
     function downloadICS() {
       const icsData = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Wedding Invitation//KO\nBEGIN:VEVENT\nUID:${new Date().getTime()}@wedding.com\nDTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z\nDTSTART:20270425T020000Z\nDTEND:20270425T040000Z\nSUMMARY:이승엽 🤍 김희애 결혼식\nLOCATION:김해 JW 웨딩홀 4층 그랜드볼룸\nDESCRIPTION:저희의 첫 출발을 축복해 주세요.\nEND:VEVENT\nEND:VCALENDAR`;
       const blob = new Blob([icsData], { type: 'text/calendar;charset=utf-8' });
@@ -524,27 +540,23 @@
       showToast('캘린더 일정이 저장되었습니다 📅');
     }
 
-    // 조건부 사진 공유
     function handlePhotoUpload() {
       if (new Date().getTime() >= new Date('2027-04-25T00:00:00').getTime()) showToast('업로드 링크로 연결됩니다.');
       else showToast('본 기능은 예식 당일(4.25)부터 활성화됩니다 🎬');
     }
 
-    // 공유하기
     function shareLink(type) {
       const url = window.location.href;
       if (type === 'kakao' && navigator.share) navigator.share({ title: '이승엽 & 김희애 결혼식', text: '2027년 4월 25일 오전 11시, 김해 JW웨딩홀 4층', url: url }).catch(console.error);
       else { navigator.clipboard.writeText(url).then(() => showToast('초대장 링크가 복사되었습니다 🔗')); }
     }
 
-    // 아코디언 및 계좌복사
     function toggleAccordion(id) {
       const content = document.getElementById(id), btnSpan = content.previousElementSibling.querySelector('span');
       content.classList.toggle('open'); btnSpan.innerText = content.classList.contains('open') ? "CLOSE -" : "OPEN +";
     }
     function copyAcc(num) { navigator.clipboard.writeText(num).then(() => showToast('계좌번호가 복사되었습니다 ✔️')); }
 
-    // RSVP 리얼 모바일 티켓
     function toggleRsvp(show) { 
       const modal = document.getElementById('rsvp-modal');
       if (show) {
@@ -565,8 +577,8 @@
     function setupSelectButtons(groupClass) {
       document.querySelectorAll(`.${groupClass}`).forEach(btn => {
         btn.addEventListener('click', (e) => {
-          document.querySelectorAll(`.${groupClass}`).forEach(b => { b.classList.remove('bg-white', 'text-black', 'font-medium'); b.classList.add('bg-[#111]', 'text-[#CCC]', 'font-light'); });
-          e.target.classList.remove('bg-[#111]', 'text-[#CCC]', 'font-light'); e.target.classList.add('bg-white', 'text-black', 'font-medium');
+          document.querySelectorAll(`.${groupClass}`).forEach(b => { b.classList.remove('bg-black', 'text-white', 'font-medium'); b.classList.add('bg-gray-100', 'text-gray-500', 'font-light'); });
+          e.target.classList.remove('bg-gray-100', 'text-gray-500', 'font-light'); e.target.classList.add('bg-black', 'text-white', 'font-medium');
         });
       });
     }
@@ -587,12 +599,10 @@
       document.getElementById('ticket-guest-name').innerText = name + ' 님';
     }
 
-    // 티켓 이미지 다운로드 기능 (html2canvas 활용)
     function downloadTicket() {
       const ticketEl = document.getElementById('ticket-card');
       showToast('티켓 이미지를 저장 중입니다 ⏳');
-      
-      html2canvas(ticketEl, { scale: 2, useCORS: true, backgroundColor: null }).then(canvas => {
+      html2canvas(ticketEl, { scale: 3, useCORS: true, backgroundColor: null }).then(canvas => {
         const link = document.createElement('a');
         link.download = 'movie_ticket_seungyeop_heeae.png';
         link.href = canvas.toDataURL('image/png');
@@ -604,7 +614,6 @@
       });
     }
 
-    // 슬레이트 액션 (미공개 컷)
     function playSlate() {
       const flash = document.createElement('div');
       flash.className = 'fixed inset-0 bg-white z-[9999] opacity-100 transition-opacity duration-500 pointer-events-none';
@@ -617,7 +626,6 @@
       setTimeout(() => { flash.classList.remove('opacity-100'); flash.classList.add('opacity-0'); setTimeout(() => flash.remove(), 500); }, 100);
     }
 
-    // 타임코드
     function updateTimecode() {
       const diff = new Date('2027-04-25T11:00:00') - new Date();
       if (diff <= 0) return document.getElementById('timecode').innerText = "00:00:00:00";
